@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         Role     @default(CUSTOMER)
+
+  orders       Order[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  price       Int
+  category    String
+  rating      Float    @default(4.5)
+  image       String
+  description String
+  sizes       String[]
+  flavors     String[]
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  status    String   @default("Pending") // Pending, Baking, Ready, Delivered, Cancelled
+
+  // owner
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // customer snapshot
+  name      String
+  phone     String
+  email     String?
+  note      String?
+
+  // fulfillment
+  type      String   // pickup | delivery
+  date      String
+  time      String
+  address   String?
+
+  total     Int
+
+  items     OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  name      String
+  price     Int
+  qty       Int
+  size      String?
+  flavor    String?
+  image     String?
+
+  createdAt DateTime @default(now())
+}

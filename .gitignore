@@ -1,0 +1,34 @@
+# Node
+node_modules/
+**/node_modules/
+
+# Env (never push)
+.env
+**/.env
+.env.*
+**/.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# Build
+dist/
+**/dist/
+build/
+**/build/
+
+# Vite
+client/node_modules/.vite
+
+# Prisma generated (do NOT commit)
+server/generated/
+
+# Uploads (usually not commit)
+server/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
