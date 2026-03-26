@@ -11,7 +11,7 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-// GET /api/admin/orders?status=Pending
+// GET /api/admin/orders?status=Pending 
 router.get("/", requireAdmin, async (req, res) => {
   try {
     const status = req.query.status;

@@ -5,29 +5,82 @@ import { requireAuth } from "../middleware/auth.js";
 const router = express.Router();
 
 /**
- * Convert size label like "0.5kg", "1kg", "2kg" to numeric kg
- * Default: 1kg
+ * Parse size label into weight in KG.
+ * Supports: "0.5kg", "1kg", "2 kg", "500g", "1/2kg"
  */
 function parseWeightKg(sizeLabel) {
-  if (!sizeLabel) return 1;
+  if (!sizeLabel) return null;
+  const s = String(sizeLabel).trim().toLowerCase();
 
-  const m = String(sizeLabel).match(/([\d.]+)\s*kg/i);
-  const kg = m ? Number(m[1]) : 1;
+  // fraction like 1/2kg
+  const frac = s.match(/(\d+)\s*\/\s*(\d+)\s*(kg|g)?/i);
+  if (frac) {
+    const a = Number(frac[1]);
+    const b = Number(frac[2]);
+    const unit = (frac[3] || "kg").toLowerCase();
+    if (Number.isFinite(a) && Number.isFinite(b) && b !== 0) {
+      const val = a / b;
+      return unit === "g" ? val / 1000 : val;
+    }
+  }
 
-  return Number.isFinite(kg) && kg > 0 ? kg : 1;
+  // grams
+  const mg = s.match(/([\d.]+)\s*g\b/i);
+  if (mg) {
+    const g = Number(mg[1]);
+    if (Number.isFinite(g) && g > 0) return g / 1000;
+  }
+
+  // kilograms
+  const mk = s.match(/([\d.]+)\s*kg\b/i);
+  if (mk) {
+    const kg = Number(mk[1]);
+    if (Number.isFinite(kg) && kg > 0) return kg;
+  }
+
+  // numeric only -> assume KG
+  const numOnly = s.match(/^([\d.]+)$/);
+  if (numOnly) {
+    const kg = Number(numOnly[1]);
+    if (Number.isFinite(kg) && kg > 0) return kg;
+  }
+
+  return null;
+}
+
+/**
+ * Choose a default size from product.sizes (smallest weight).
+ */
+function chooseDefaultSize(sizes) {
+  if (!Array.isArray(sizes) || sizes.length === 0) return null;
+
+  let best = sizes[0];
+  let bestKg = parseWeightKg(best);
+
+  for (const s of sizes) {
+    const kg = parseWeightKg(s);
+    if (kg == null) continue;
+    if (bestKg == null || kg < bestKg) {
+      best = s;
+      bestKg = kg;
+    }
+  }
+
+  return best;
 }
 
 /**
  * Calculate price based on weight.
- * product.price is assumed to be price for 1kg.
+ * Assumption: product.price is 1kg price.
  */
 function calcPriceByWeight(product, sizeLabel) {
-  const base = Number(product?.price ?? 0); // 1kg price
-  const kg = parseWeightKg(sizeLabel);
-  const val = base * kg;
+  const base = Number(product?.price ?? 0);
+  const kg = parseWeightKg(sizeLabel) ?? 1; // fallback 1kg if cannot parse
+  return Math.round(base * kg);
+}
 
-  // round to nearest rupee
-  return Math.round(val);
+function norm(v) {
+  return String(v ?? "").trim().toLowerCase();
 }
 
 // ✅ Create order (requires login)
@@ -35,11 +88,11 @@ router.post("/", requireAuth, async (req, res) => {
   try {
     const { customer, fulfillment, items } = req.body || {};
 
-    // ----- Validate customer -----
-    if (!customer?.name?.trim()) return res.status(400).json({ message: "Customer name is required" });
-    if (!customer?.phone?.trim()) return res.status(400).json({ message: "Customer phone is required" });
+    if (!customer?.name?.trim())
+      return res.status(400).json({ message: "Customer name is required" });
+    if (!customer?.phone?.trim())
+      return res.status(400).json({ message: "Customer phone is required" });
 
-    // ----- Validate fulfillment -----
     const type = fulfillment?.type;
     if (type !== "pickup" && type !== "delivery") {
       return res.status(400).json({ message: "Fulfillment type must be pickup or delivery" });
@@ -51,26 +104,27 @@ router.post("/", requireAuth, async (req, res) => {
       return res.status(400).json({ message: "Delivery address is required" });
     }
 
-    // ----- Validate items -----
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: "Cart items are required" });
     }
 
-    const productIds = [...new Set(items.map((i) => i.productId).filter(Boolean))];
+    // allow both productId and id coming from client (robust)
+    const productIds = [...new Set(items.map((i) => i.productId || i.id).filter(Boolean))];
     if (productIds.length === 0) {
       return res.status(400).json({ message: "Invalid cart items" });
     }
 
-    // fetch products
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
     });
 
     const productMap = new Map(products.map((p) => [p.id, p]));
 
-    // validate each item
+    const orderItemsData = [];
+
     for (const i of items) {
-      const p = productMap.get(i.productId);
+      const pid = i.productId || i.id;
+      const p = productMap.get(pid);
       if (!p) return res.status(400).json({ message: "Invalid product in cart" });
 
       const qty = Number(i.qty);
@@ -78,39 +132,41 @@ router.post("/", requireAuth, async (req, res) => {
         return res.status(400).json({ message: "Invalid quantity" });
       }
 
-      // optional: validate size exists in product.sizes
-      const selectedSize = i.size || null;
-      if (selectedSize && Array.isArray(p.sizes) && p.sizes.length) {
-        if (!p.sizes.includes(selectedSize)) {
+      const hasSizes = Array.isArray(p.sizes) && p.sizes.length > 0;
+
+      // ✅ If client didn't send size, server picks a safe default (smallest)
+      let selectedSize = i.size ?? null;
+      if (!selectedSize && hasSizes) {
+        selectedSize = chooseDefaultSize(p.sizes);
+      }
+
+      // validate size if sizes exist
+      if (hasSizes && selectedSize) {
+        const ok = p.sizes.some((s) => norm(s) === norm(selectedSize));
+        if (!ok) {
           return res.status(400).json({ message: `Invalid size for product: ${p.name}` });
         }
       }
-    }
 
-    // build order items with computed price
-    const orderItemsData = items.map((i) => {
-      const p = productMap.get(i.productId);
-
-      const selectedSize = i.size || null;
+      // compute unit price from size
       const computedUnitPrice = calcPriceByWeight(p, selectedSize);
 
-      return {
+      orderItemsData.push({
         productId: p.id,
         name: p.name,
-        price: computedUnitPrice,       // ✅ price adjusted by weight
-        qty: Number(i.qty),
+        price: computedUnitPrice, // ✅ computed unit price saved
+        qty,
         size: selectedSize,
         flavor: i.flavor || null,
-        image: p.image || null,         // uses product image
-      };
-    });
+        image: p.image || null,
+      });
+    }
 
-    // compute total from computed prices
     const total = orderItemsData.reduce((sum, x) => sum + x.price * x.qty, 0);
 
     const created = await prisma.order.create({
       data: {
-        user: { connect: { id: req.user.id } }, // ✅ required link to user
+        user: { connect: { id: req.user.id } },
 
         status: "Pending",
         name: customer.name.trim(),
@@ -157,10 +213,9 @@ router.get("/:id", requireAuth, async (req, res) => {
   }
 });
 
-// ✅ Get my orders list (or all for admin if mine=0)
+// ✅ Get orders list (mine=1 => my orders only)
 router.get("/", requireAuth, async (req, res) => {
   try {
-    // /api/orders?mine=1
     const mine = String(req.query.mine || "") === "1";
 
     const where =

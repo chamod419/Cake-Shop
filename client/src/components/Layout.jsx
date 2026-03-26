@@ -14,7 +14,7 @@ export default function Layout() {
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="font-bold text-xl">CakeShop</Link>
+          <Link to="/" className="font-bold text-xl">Jonathan's Bakes</Link>
 
           <nav className="flex items-center gap-4 text-sm">
             <Link to="/" className="hover:underline">Home</Link>

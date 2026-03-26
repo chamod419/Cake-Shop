@@ -4,7 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -13,7 +14,7 @@ enum Role {
 }
 
 model User {
-  id           String   @id @default(cuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   username     String   @unique
   passwordHash String
   role         Role     @default(CUSTOMER)
@@ -25,38 +26,35 @@ model User {
 }
 
 model Product {
-  id          String   @id @default(cuid())
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   price       Int
   category    String
-  rating      Float    @default(4.5)
+  rating      Float       @default(4.5)
   image       String
   description String
   sizes       String[]
   flavors     String[]
-  isAvailable Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isAvailable Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   orderItems  OrderItem[]
 }
 
 model Order {
-  id        String   @id @default(cuid())
-  status    String   @default("Pending") // Pending, Baking, Ready, Delivered, Cancelled
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  status    String      @default("Pending")
 
-  // owner
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String      @db.ObjectId
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // customer snapshot
   name      String
   phone     String
   email     String?
   note      String?
 
-  // fulfillment
-  type      String   // pickup | delivery
+  type      String
   date      String
   time      String
   address   String?
@@ -65,18 +63,21 @@ model Order {
 
   items     OrderItem[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
 
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String    @db.ObjectId
+  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+  productId String    @db.ObjectId
+  product   Product   @relation(fields: [productId], references: [id])
 
   name      String
   price     Int
@@ -85,5 +86,8 @@ model OrderItem {
   flavor    String?
   image     String?
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+
+  @@index([orderId])
+  @@index([productId])
 }

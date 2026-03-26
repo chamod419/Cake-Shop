@@ -10,7 +10,7 @@ export default function Navbar() {
     <header className="border-b bg-white">
       <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
         <Link to="/" className="font-bold text-lg">
-          CakeShop
+          Jonathan's Bakes
         </Link>
 
         <nav className="flex gap-2">

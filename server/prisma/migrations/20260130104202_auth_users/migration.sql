@@ -1,8 +1,5 @@
 /*
-  Warnings:
-
-  - Added the required column `userId` to the `Order` table without a default value. This is not possible if the table is not empty.
-
+ 
 */
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('CUSTOMER', 'ADMIN');

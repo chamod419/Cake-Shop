@@ -4,7 +4,7 @@ import { requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// ✅ Admin: list all orders
+// Adminlist all orders
 router.get("/", requireAdmin, async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
@@ -21,7 +21,7 @@ router.get("/", requireAdmin, async (req, res) => {
   }
 });
 
-// ✅ Admin: update order status
+// Admin update order status
 router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     const status = String(req.body?.status || "").trim();

@@ -110,21 +110,27 @@ export function CartProvider({ children }) {
 
   const api = useMemo(() => {
     function addToCart(product, { size, flavor, qty = 1 } = {}) {
-      const unitPrice = safeNumber(calcUnitPrice(product, size), 0);
+  // ✅ If size not provided, choose the first size (e.g., 0.5kg)
+  const selectedSize =
+    size ||
+    (Array.isArray(product.sizes) && product.sizes.length ? product.sizes[0] : null);
 
-      dispatch({
-        type: "ADD",
-        payload: {
-          productId: product.id,
-          name: product.name,
-          image: product.image,
-          size: size || null,
-          flavor: flavor || null,
-          qty: Math.max(1, safeNumber(qty, 1)),
-          unitPrice,
-        },
-      });
-    }
+  const unitPrice = calcUnitPrice(product, selectedSize);
+
+  dispatch({
+    type: "ADD",
+    payload: {
+      productId: product.id,
+      name: product.name,
+      image: product.image,
+      size: selectedSize,        // ✅ IMPORTANT: store size
+      flavor: flavor || null,
+      qty,
+      unitPrice,
+    },
+  });
+}
+
 
     function setQty(itemKey, qty) {
       dispatch({ type: "QTY", payload: { k: itemKey, qty } });

@@ -69,9 +69,9 @@ export default function OrderSuccess() {
         <Link to="/shop" className="rounded-xl bg-black text-white px-5 py-3">
           Continue shopping
         </Link>
-        <Link to="/admin" className="rounded-xl border px-5 py-3">
+        {/* <Link to="/admin" className="rounded-xl border px-5 py-3">
           Admin Panel
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

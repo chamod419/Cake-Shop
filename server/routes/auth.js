@@ -11,8 +11,8 @@ function cookieOptions() {
   return {
     httpOnly: true,
     sameSite: "lax",
-    secure: false,     // true only in https production
-    path: "/",         // ✅ IMPORTANT
+    secure: false,     
+    path: "/",         
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 }
@@ -77,8 +77,8 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
-  // ✅ Clear with SAME options (path matters)
-  res.clearCookie(COOKIE_NAME, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+  
+  res.clearCookie(COOKIE_NAME, cookieOptions());
   res.json({ ok: true });
 });
 

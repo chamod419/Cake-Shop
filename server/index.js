@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(authOptional);
 
-// ✅ serve uploaded images
+// serve uploaded images
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
