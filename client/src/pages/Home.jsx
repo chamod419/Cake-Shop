@@ -1,20 +1,9 @@
-// import { useEffect, useMemo, useState } from "react";
-// import { Link } from "react-router-dom";
-// import { motion, useScroll, useTransform } from "framer-motion";
-// import resolveImage from "../utils/resolveImage";
-
-// // const API_BASE_URL = "http://localhost:5000";
-
-// const API_BASE_URL = import.meta.env.VITE_API_URL;
-
 import { useEffect, useMemo, useState } from "react";
-import { useCart } from "../context/CartContext.jsx";
-// import { motion, AnimatePresence } from "framer-motion";
-import resolveImage from "../utils/resolveImage";
+import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
+import resolveImage from "../utils/resolveImage";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
-
 
 function formatLKR(v) {
   const n = Number(v || 0);
@@ -40,48 +29,40 @@ function pickFeatured(products, count = 6) {
 // Enhanced animation variants
 const fadeUp = {
   hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
-  show: { 
-    opacity: 1, 
-    y: 0, 
-    filter: "blur(0px)",
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
-  },
-};
-
-const fadeIn = {
-  hidden: { opacity: 0 },
-  show: { 
+  show: {
     opacity: 1,
-    transition: { duration: 0.6, ease: "easeOut" }
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const stagger = {
   hidden: {},
-  show: { 
-    transition: { 
+  show: {
+    transition: {
       staggerChildren: 0.12,
-      delayChildren: 0.1
-    } 
+      delayChildren: 0.1,
+    },
   },
 };
 
 const scaleIn = {
   hidden: { scale: 0.9, opacity: 0 },
-  show: { 
-    scale: 1, 
+  show: {
+    scale: 1,
     opacity: 1,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
-  }
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
 const slideIn = {
   hidden: { x: -60, opacity: 0 },
-  show: { 
-    x: 0, 
+  show: {
+    x: 0,
     opacity: 1,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
-  }
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
 function SectionTitle({ title, subtitle, right }) {
@@ -116,15 +97,14 @@ function FeaturedCard({ p, index }) {
       variants={fadeUp}
       custom={index}
       whileHover={{ y: -12, scale: 1.02 }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 300, 
+      transition={{
+        type: "spring",
+        stiffness: 300,
         damping: 20,
-        mass: 0.5
+        mass: 0.5,
       }}
       className="group relative rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl"
     >
-      {/* Shimmer effect on hover */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
       </div>
@@ -139,11 +119,9 @@ function FeaturedCard({ p, index }) {
           transition={{ duration: 0.6, ease: "easeOut" }}
         />
 
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        {/* Rating badge with animation */}
-        <motion.div 
+        <motion.div
           className="absolute left-4 top-4 rounded-full bg-white/95 backdrop-blur-sm px-4 py-2 shadow-lg"
           whileHover={{ scale: 1.1, rotate: 5 }}
           transition={{ type: "spring", stiffness: 400 }}
@@ -154,7 +132,6 @@ function FeaturedCard({ p, index }) {
           </span>
         </motion.div>
 
-        {/* Category badge */}
         <div className="absolute right-4 top-4 rounded-full bg-gray-900/90 backdrop-blur-sm text-white px-4 py-2 text-xs font-medium tracking-wide uppercase shadow-lg">
           {p.category}
         </div>
@@ -170,7 +147,7 @@ function FeaturedCard({ p, index }) {
               {p.description}
             </p>
           </div>
-          <motion.div 
+          <motion.div
             className="text-lg font-bold text-gray-900 whitespace-nowrap"
             whileHover={{ scale: 1.05 }}
           >
@@ -188,7 +165,7 @@ function FeaturedCard({ p, index }) {
             className="group/btn relative overflow-hidden rounded-full bg-gray-900 px-6 py-2.5 text-white text-sm font-medium transition-all hover:bg-gray-800 hover:shadow-lg"
           >
             <span className="relative z-10">View Details</span>
-            <motion.div 
+            <motion.div
               className="absolute inset-0 bg-gradient-to-r from-gray-800 to-gray-900"
               initial={{ x: "-100%" }}
               whileHover={{ x: 0 }}
@@ -208,25 +185,21 @@ export default function Home() {
   const [ripples, setRipples] = useState([]);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  
   const viewportHeight =
-  typeof window !== "undefined" ? window.innerHeight : 1000;
+    typeof window !== "undefined" ? window.innerHeight : 1000;
 
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.3]);
 
-
-  // Track mouse position
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePos({ x: e.clientX, y: e.clientY });
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Ripple effect on click
   const createRipple = (e) => {
     const ripple = {
       x: e.clientX,
@@ -267,14 +240,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 relative overflow-hidden">
-      {/* Global Magical Particles Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Mouse follower glow effect */}
         <motion.div
           className="absolute w-96 h-96 rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(251, 191, 36, 0.08), rgba(251, 113, 133, 0.06), transparent)',
-            filter: 'blur(40px)',
+            background:
+              "radial-gradient(circle, rgba(251, 191, 36, 0.08), rgba(251, 113, 133, 0.06), transparent)",
+            filter: "blur(40px)",
           }}
           animate={{
             x: mousePos.x - 192,
@@ -288,12 +260,12 @@ export default function Home() {
           }}
         />
 
-        {/* Secondary glow with delay */}
         <motion.div
           className="absolute w-64 h-64 rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.06), rgba(251, 113, 133, 0.04), transparent)',
-            filter: 'blur(30px)',
+            background:
+              "radial-gradient(circle, rgba(249, 115, 22, 0.06), rgba(251, 113, 133, 0.04), transparent)",
+            filter: "blur(30px)",
           }}
           animate={{
             x: mousePos.x - 128,
@@ -311,7 +283,7 @@ export default function Home() {
           const size = Math.random() * 6 + 2;
           const duration = Math.random() * 20 + 20;
           const delay = Math.random() * 10;
-          
+
           return (
             <motion.div
               key={i}
@@ -321,12 +293,17 @@ export default function Home() {
                 height: `${size}px`,
                 left: `${Math.random() * 100}%`,
                 background: `radial-gradient(circle, ${
-                  ['rgba(251, 191, 36, 0.4)', 'rgba(251, 113, 133, 0.4)', 'rgba(249, 115, 22, 0.4)', 'rgba(168, 85, 247, 0.4)'][Math.floor(Math.random() * 4)]
+                  [
+                    "rgba(251, 191, 36, 0.4)",
+                    "rgba(251, 113, 133, 0.4)",
+                    "rgba(249, 115, 22, 0.4)",
+                    "rgba(168, 85, 247, 0.4)",
+                  ][Math.floor(Math.random() * 4)]
                 }, transparent)`,
-                filter: 'blur(1px)',
+                filter: "blur(1px)",
               }}
               animate={{
-                y: ['100vh', '-10vh'],
+                y: ["100vh", "-10vh"],
                 x: [0, Math.random() * 100 - 50],
                 scale: [0, 1, 1, 0],
                 opacity: [0, 0.6, 0.6, 0],
@@ -460,8 +437,10 @@ export default function Home() {
         }
       `}</style>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24 relative z-10" onClick={createRipple}>
-        {/* Ripple effects */}
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24 relative z-10"
+        onClick={createRipple}
+      >
         {ripples.map((ripple) => (
           <div
             key={ripple.id}
@@ -475,44 +454,40 @@ export default function Home() {
           />
         ))}
 
-        {/* Floating Geometric Shapes */}
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          {/* Circles */}
           <motion.div
             className="absolute w-96 h-96 rounded-full border border-amber-200/20"
-            style={{ top: '10%', left: '5%' }}
-            animate={{ 
+            style={{ top: "10%", left: "5%" }}
+            animate={{
               scale: [1, 1.2, 1],
               rotate: [0, 180, 360],
-              opacity: [0.05, 0.15, 0.05]
+              opacity: [0.05, 0.15, 0.05],
             }}
             transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           />
-          
+
           <motion.div
             className="absolute w-64 h-64 rounded-full border-2 border-rose-200/20"
-            style={{ top: '60%', right: '10%' }}
-            animate={{ 
+            style={{ top: "60%", right: "10%" }}
+            animate={{
               scale: [1.2, 1, 1.2],
               rotate: [360, 180, 0],
-              opacity: [0.1, 0.05, 0.1]
+              opacity: [0.1, 0.05, 0.1],
             }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           />
 
-          {/* Squares */}
           <motion.div
             className="absolute w-48 h-48 border border-orange-200/20"
-            style={{ top: '40%', left: '15%', transform: 'rotate(45deg)' }}
-            animate={{ 
+            style={{ top: "40%", left: "15%", transform: "rotate(45deg)" }}
+            animate={{
               rotate: [45, 405],
               scale: [1, 1.3, 1],
-              opacity: [0.05, 0.1, 0.05]
+              opacity: [0.05, 0.1, 0.05],
             }}
             transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
           />
 
-          {/* Dots pattern */}
           {Array.from({ length: 15 }).map((_, i) => (
             <motion.div
               key={`dot-${i}`}
@@ -531,12 +506,11 @@ export default function Home() {
                 duration: Math.random() * 5 + 5,
                 repeat: Infinity,
                 delay: Math.random() * 2,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             />
           ))}
 
-          {/* Wavy lines */}
           <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.03 }}>
             <motion.path
               d="M0,100 Q250,50 500,100 T1000,100 T1500,100 T2000,100"
@@ -569,26 +543,24 @@ export default function Home() {
           </svg>
         </div>
 
-        {/* HERO SECTION */}
-        <motion.section 
+        <motion.section
           className="relative overflow-hidden rounded-3xl"
           style={{ y: heroY, opacity: heroOpacity }}
         >
-          {/* Animated background elements */}
           <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50" />
-          
+
           <motion.div
             className="absolute -left-40 -top-40 w-96 h-96 rounded-full bg-gradient-to-br from-amber-200/30 to-rose-200/30 blur-3xl"
-            animate={{ 
+            animate={{
               scale: [1, 1.2, 1],
               rotate: [0, 90, 0],
             }}
             transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
           />
-          
+
           <motion.div
             className="absolute -right-40 -bottom-40 w-96 h-96 rounded-full bg-gradient-to-br from-rose-200/30 to-orange-200/30 blur-3xl"
-            animate={{ 
+            animate={{
               scale: [1.2, 1, 1.2],
               rotate: [90, 0, 90],
             }}
@@ -596,7 +568,6 @@ export default function Home() {
           />
 
           <div className="relative grid gap-12 p-8 md:p-16 lg:grid-cols-2 lg:items-center">
-            {/* Animated Particles Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               {Array.from({ length: 20 }).map((_, i) => (
                 <motion.div
@@ -604,8 +575,8 @@ export default function Home() {
                   className="absolute w-1 h-1 rounded-full bg-gradient-to-br from-amber-400 to-rose-400"
                   style={{
                     left: `${Math.random() * 100}%`,
-                    bottom: '0%',
-                    '--tx': `${(Math.random() - 0.5) * 200}px`,
+                    bottom: "0%",
+                    "--tx": `${(Math.random() - 0.5) * 200}px`,
                   }}
                   animate={{
                     y: [0, -viewportHeight],
@@ -644,7 +615,7 @@ export default function Home() {
                 className="mt-8 text-5xl md:text-7xl font-serif font-light tracking-tight text-gray-900 leading-tight"
               >
                 Crafted with
-                <motion.span 
+                <motion.span
                   className="relative block mt-2"
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 300 }}
@@ -672,7 +643,7 @@ export default function Home() {
                 variants={fadeUp}
                 className="mt-6 text-lg md:text-xl text-gray-600 font-light leading-relaxed max-w-xl"
               >
-                Indulge in exquisite cakes made from premium ingredients. 
+                Indulge in exquisite cakes made from premium ingredients.
                 Each creation is a masterpiece designed to make your moments unforgettable.
               </motion.p>
 
@@ -684,14 +655,14 @@ export default function Home() {
                   to="/shop"
                   className="group relative overflow-hidden rounded-full bg-gray-900 px-8 py-4 text-white font-medium text-lg shadow-xl hover:shadow-2xl transition-all"
                 >
-                  <motion.span 
+                  <motion.span
                     className="relative z-10 flex items-center gap-2"
                     whileHover={{ x: 5 }}
                   >
                     Explore Collection
                     <span className="transition-transform group-hover:translate-x-1">→</span>
                   </motion.span>
-                  <motion.div 
+                  <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-amber-600 to-rose-600"
                     initial={{ x: "-100%" }}
                     whileHover={{ x: 0 }}
@@ -732,7 +703,6 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
-            {/* Hero Image with 3D Effect */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
               animate={{ opacity: 1, scale: 1, rotateY: 0 }}
@@ -740,14 +710,14 @@ export default function Home() {
               className="relative perspective-1000"
             >
               <motion.div
-                animate={{ 
+                animate={{
                   y: [0, -15, 0],
-                  rotateZ: [0, 1, 0]
+                  rotateZ: [0, 1, 0],
                 }}
-                transition={{ 
-                  duration: 6, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
                 }}
                 className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl"
               >
@@ -760,7 +730,6 @@ export default function Home() {
                 />
               </motion.div>
 
-              {/* Floating badge */}
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -788,7 +757,6 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Scroll Indicator with Mouse Animation */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -802,11 +770,10 @@ export default function Home() {
             >
               Scroll to explore
             </motion.div>
-            
-            {/* Animated Mouse */}
+
             <motion.div
               className="relative w-7 h-11 rounded-full border-2 border-gray-400 flex items-start justify-center p-1.5"
-              whileHover={{ scale: 1.1, borderColor: '#000' }}
+              whileHover={{ scale: 1.1, borderColor: "#000" }}
             >
               <motion.div
                 className="w-1.5 h-2 rounded-full bg-gray-400"
@@ -815,21 +782,20 @@ export default function Home() {
               />
             </motion.div>
 
-            {/* Scroll Arrow Indicators */}
             <div className="flex flex-col gap-1">
               {[0, 1, 2].map((i) => (
                 <motion.div
                   key={i}
                   className="w-0.5 h-2 bg-gray-400 rounded-full"
-                  animate={{ 
+                  animate={{
                     opacity: [0, 1, 0],
-                    scaleY: [0.5, 1, 0.5]
+                    scaleY: [0.5, 1, 0.5],
                   }}
-                  transition={{ 
-                    duration: 1.5, 
-                    repeat: Infinity, 
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
                     delay: i * 0.2,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 />
               ))}
@@ -837,7 +803,6 @@ export default function Home() {
           </motion.div>
         </motion.section>
 
-        {/* FEATURED CAKES */}
         <section>
           <SectionTitle
             title="Signature Collection"
@@ -848,8 +813,8 @@ export default function Home() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <Link 
-                  to="/shop" 
+                <Link
+                  to="/shop"
                   className="group inline-flex items-center gap-2 text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
                 >
                   View All
@@ -860,7 +825,7 @@ export default function Home() {
           />
 
           {err && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="rounded-2xl border-2 border-red-200 bg-red-50 p-6 text-red-700"
@@ -872,8 +837,8 @@ export default function Home() {
           {loading && (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <motion.div 
-                  key={i} 
+                <motion.div
+                  key={i}
                   className="rounded-2xl border border-gray-200 bg-white p-4 shadow-lg"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -902,7 +867,6 @@ export default function Home() {
           )}
         </section>
 
-        {/* OCCASIONS */}
         <section className="interactive-bg rounded-3xl bg-white border border-gray-100 p-12 shadow-lg">
           <SectionTitle
             title="Perfect for Every Occasion"
@@ -917,35 +881,35 @@ export default function Home() {
             className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
           >
             {[
-              { 
-                title: "Birthdays", 
-                icon: "🎉", 
+              {
+                title: "Birthdays",
+                icon: "🎉",
                 desc: "Colorful designs that celebrate joy",
                 gradient: "from-pink-500/10 to-purple-500/10",
-                hover: "group-hover:from-pink-500/20 group-hover:to-purple-500/20"
+                hover: "group-hover:from-pink-500/20 group-hover:to-purple-500/20",
               },
-              { 
-                title: "Weddings", 
-                icon: "💍", 
+              {
+                title: "Weddings",
+                icon: "💍",
                 desc: "Elegant tiers for your special day",
                 gradient: "from-rose-500/10 to-amber-500/10",
-                hover: "group-hover:from-rose-500/20 group-hover:to-amber-500/20"
+                hover: "group-hover:from-rose-500/20 group-hover:to-amber-500/20",
               },
-              { 
-                title: "Celebrations", 
-                icon: "🥂", 
+              {
+                title: "Celebrations",
+                icon: "🥂",
                 desc: "Mark milestones with sophistication",
                 gradient: "from-blue-500/10 to-cyan-500/10",
-                hover: "group-hover:from-blue-500/20 group-hover:to-cyan-500/20"
+                hover: "group-hover:from-blue-500/20 group-hover:to-cyan-500/20",
               },
-              { 
-                title: "Kids Party", 
-                icon: "🧸", 
+              {
+                title: "Kids Party",
+                icon: "🧸",
                 desc: "Whimsical themes they'll love",
                 gradient: "from-orange-500/10 to-yellow-500/10",
-                hover: "group-hover:from-orange-500/20 group-hover:to-yellow-500/20"
+                hover: "group-hover:from-orange-500/20 group-hover:to-yellow-500/20",
               },
-            ].map((c, i) => (
+            ].map((c) => (
               <motion.div key={c.title} variants={fadeUp}>
                 <Link
                   to="/shop"
@@ -970,7 +934,6 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* WHY CHOOSE US */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 p-12 md:p-16">
           <motion.div
             className="absolute top-0 right-0 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl"
@@ -980,7 +943,11 @@ export default function Home() {
 
           <SectionTitle
             title={<span className="text-white">Why We're Different</span>}
-            subtitle={<span className="text-gray-300">Excellence in every detail, from ingredients to delivery</span>}
+            subtitle={
+              <span className="text-gray-300">
+                Excellence in every detail, from ingredients to delivery
+              </span>
+            }
           />
 
           <motion.div
@@ -1006,7 +973,7 @@ export default function Home() {
                 title: "Swift & Reliable",
                 desc: "Same-day delivery available with temperature-controlled packaging for perfect freshness.",
               },
-            ].map((b, i) => (
+            ].map((b) => (
               <motion.div
                 key={b.title}
                 variants={fadeUp}
@@ -1014,7 +981,7 @@ export default function Home() {
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="group rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 p-8 hover:bg-white/20 transition-all"
               >
-                <motion.div 
+                <motion.div
                   className="text-5xl mb-5"
                   whileHover={{ scale: 1.2, rotate: 10 }}
                 >
@@ -1023,15 +990,12 @@ export default function Home() {
                 <h3 className="font-serif text-2xl font-medium text-white mb-3">
                   {b.title}
                 </h3>
-                <p className="text-gray-300 leading-relaxed font-light">
-                  {b.desc}
-                </p>
+                <p className="text-gray-300 leading-relaxed font-light">{b.desc}</p>
               </motion.div>
             ))}
           </motion.div>
         </section>
 
-        {/* TESTIMONIALS */}
         <section className="interactive-bg rounded-3xl bg-white border border-gray-100 p-12 shadow-lg">
           <SectionTitle
             title="What Our Clients Say"
@@ -1050,21 +1014,21 @@ export default function Home() {
                 name: "Nimal Perera",
                 role: "Birthday Client",
                 text: "The attention to detail was extraordinary. Our daughter's unicorn cake was even more beautiful than we imagined. Worth every rupee!",
-                rating: 5
+                rating: 5,
               },
               {
                 name: "Shalini Fernando",
                 role: "Wedding Client",
                 text: "Our 5-tier wedding cake was the centerpiece of our reception. The craftsmanship and taste exceeded all expectations.",
-                rating: 5
+                rating: 5,
               },
               {
                 name: "Ravi Wickramasinghe",
                 role: "Corporate Client",
                 text: "We order regularly for company events. Consistently exceptional quality and professional service every single time.",
-                rating: 5
+                rating: 5,
               },
-            ].map((t, i) => (
+            ].map((t) => (
               <motion.div
                 key={t.name}
                 variants={fadeUp}
@@ -1093,7 +1057,6 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* CUSTOM CTA */}
         <motion.section
           id="custom"
           initial={{ opacity: 0, y: 40 }}
@@ -1105,8 +1068,9 @@ export default function Home() {
           <motion.div
             className="absolute top-0 left-0 w-full h-full opacity-20"
             style={{
-              backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 80%, white 1px, transparent 1px)",
-              backgroundSize: "50px 50px"
+              backgroundImage:
+                "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 80%, white 1px, transparent 1px)",
+              backgroundSize: "50px 50px",
             }}
             animate={{ backgroundPosition: ["0px 0px", "50px 50px"] }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -1114,7 +1078,7 @@ export default function Home() {
 
           <div className="relative grid gap-8 lg:grid-cols-2 lg:items-center">
             <div className="text-white">
-              <motion.h2 
+              <motion.h2
                 className="text-4xl md:text-5xl font-serif font-light tracking-tight mb-4"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -1122,19 +1086,19 @@ export default function Home() {
               >
                 Dream It. We'll Create It.
               </motion.h2>
-              <motion.p 
+              <motion.p
                 className="text-lg text-white/90 font-light leading-relaxed"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
               >
-                From concept sketches to the final masterpiece, our team brings your vision to life. 
+                From concept sketches to the final masterpiece, our team brings your vision to life.
                 Share your theme, preferences, and occasion details—we handle the rest with precision.
               </motion.p>
             </div>
 
-            <motion.div 
+            <motion.div
               className="flex flex-col sm:flex-row gap-4 lg:justify-end"
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -1160,8 +1124,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* FOOTER */}
-        <motion.footer 
+        <motion.footer
           className="text-center py-12 border-t border-gray-200"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -1170,9 +1133,6 @@ export default function Home() {
           <p className="text-sm text-gray-500 font-light">
             © {new Date().getFullYear()} CakeShop • Crafted with passion in Sri Lanka
           </p>
-          {/* <p className="text-xs text-gray-400 mt-2">
-            React • Node.js • PostgreSQL
-          </p> */}
         </motion.footer>
       </div>
     </div>
