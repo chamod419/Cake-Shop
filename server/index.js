@@ -14,6 +14,7 @@ import adminOrdersDbRoutes from "./routes/adminOrdersDb.js";
 import adminProductsRoutes from "./routes/adminProducts.js";
 
 const app = express();
+const isProd = process.env.NODE_ENV === "production";
 
 app.use(
   cors({
