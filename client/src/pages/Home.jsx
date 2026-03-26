@@ -9,8 +9,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useCart } from "../context/CartContext.jsx";
-import { motion, AnimatePresence } from "framer-motion";
+// import { motion, AnimatePresence } from "framer-motion";
 import resolveImage from "../utils/resolveImage";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
