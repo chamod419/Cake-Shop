@@ -207,9 +207,14 @@ export default function Home() {
   const [ripples, setRipples] = useState([]);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
+  
+  const viewportHeight =
+  typeof window !== "undefined" ? window.innerHeight : 1000;
+
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.3]);
+
 
   // Track mouse position
   useEffect(() => {
@@ -602,7 +607,7 @@ export default function Home() {
                     '--tx': `${(Math.random() - 0.5) * 200}px`,
                   }}
                   animate={{
-                    y: [0, -window.innerHeight],
+                    y: [0, -viewportHeight],
                     x: [(Math.random() - 0.5) * 200],
                     scale: [1, Math.random() * 2 + 0.5, 0],
                     opacity: [0, 0.8, 0],
