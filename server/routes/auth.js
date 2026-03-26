@@ -7,12 +7,14 @@ const router = express.Router();
 
 const COOKIE_NAME = "token";
 
+const isProd = process.env.NODE_ENV === "production";
+
 function cookieOptions() {
   return {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,     
-    path: "/",         
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
+    path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 }
