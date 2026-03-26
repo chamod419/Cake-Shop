@@ -1,9 +1,19 @@
+// import { useEffect, useMemo, useState } from "react";
+// import { Link } from "react-router-dom";
+// import { motion, useScroll, useTransform } from "framer-motion";
+// import resolveImage from "../utils/resolveImage";
+
+// // const API_BASE_URL = "http://localhost:5000";
+
+// const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useCart } from "../context/CartContext.jsx";
+import { motion, AnimatePresence } from "framer-motion";
 import resolveImage from "../utils/resolveImage";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 
 function formatLKR(v) {
   const n = Number(v || 0);

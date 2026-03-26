@@ -2,16 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useCart } from "../context/CartContext.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 
-const API_BASE_URL = "http://localhost:5000";
+import resolveImage from "../utils/resolveImage";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // ✅ resolve uploaded/local image paths correctly
-function resolveImage(src) {
-  if (!src) return "https://placehold.co/900x600?text=Cake";
-  if (src.startsWith("http")) return src; // external links
-  if (src.startsWith("data:")) return src; // base64 images
-  // backend saved "/uploads/xxx.jpg" -> must load from backend host
-  return `${API_BASE_URL}${src}`;
-}
+// function resolveImage(src) {
+//   if (!src) return "https://placehold.co/900x600?text=Cake";
+//   if (src.startsWith("http")) return src; // external links
+//   if (src.startsWith("data:")) return src; // base64 images
+//   // backend saved "/uploads/xxx.jpg" -> must load from backend host
+//   return `${API_BASE_URL}${src}`;
+// }
 
 /* ✅ NEW: weight + price helpers (price adjusts by selected size) */
 function parseWeightKg(sizeLabel) {
